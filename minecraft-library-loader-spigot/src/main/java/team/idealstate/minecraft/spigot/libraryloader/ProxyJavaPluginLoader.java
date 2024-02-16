@@ -30,7 +30,9 @@ import org.bukkit.plugin.java.JavaPluginLoader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -42,7 +44,7 @@ import java.util.regex.Pattern;
  * @version 1.0.0
  * @since 1.0.0
  */
-final class ProxyJavaPluginLoader implements PluginLoader {
+public class ProxyJavaPluginLoader implements PluginLoader {
 
     private static final Logger logger = LogManager.getLogger(ProxyJavaPluginLoader.class);
     private final PluginLoader pluginLoader;
