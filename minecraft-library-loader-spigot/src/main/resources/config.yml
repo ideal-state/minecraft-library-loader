@@ -5,8 +5,8 @@
 #         自定义仓库           #
 ##############################
 repositories:
-  aliyun-public:
-    url: https://maven.aliyun.com/repository/public/
+  aliyun-central:
+    url: https://maven.aliyun.com/repository/central/
   sonatype-public:
     url: https://oss.sonatype.org/content/groups/public/
 
