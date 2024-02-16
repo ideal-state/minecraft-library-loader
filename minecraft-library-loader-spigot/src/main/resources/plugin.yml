@@ -1,0 +1,5 @@
+name: ${name}
+version: ${version}
+main: team.idealstate.minecraft.spigot.libraryloader.LibraryLoader
+author: ketikai
+load: STARTUP

@@ -1,0 +1,82 @@
+name: release
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    if: github.event_name == 'push'
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: "8"
+          check-latest: true
+          distribution: "zulu"
+          server-id: github
+          settings-path: ${{ github.workspace }}
+          cache: "gradle"
+          cache-dependency-path: |
+            **/*.gradle*
+            **/gradle-wrapper.properties
+
+      - name: Get current version
+        run: |
+          chmod +x ./gradlew
+          echo "project_version="$($(pwd)/gradlew :properties | grep '^version:' | awk '{printf $2}') >> "$GITHUB_ENV"
+
+      - name: Check version
+        id: check_release
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          script: |
+            let releaseByTag;
+            try {
+              releaseByTag = await github.rest.repos.getReleaseByTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag: '${{ env.project_version }}'
+              })
+            } catch (error) {
+              if (error.message == 'Not Found') {
+                releaseByTag = {
+                  status: 404
+                }
+              } else {
+                throw error
+              }
+            }
+            if (releaseByTag.status == '404') {
+              console.log("release tag '${{ env.project_version }}' is new version.")
+            } else {
+              console.log("release tag '${{ env.project_version }}' is already exists.")
+            }
+            return releaseByTag.status
+
+      - name: Gradle Jar
+        if: steps.check_release.outputs.result == '404'
+        run: ./gradlew :clean :minecraft-library-loader-spigot:jar
+
+      - name: Create a release
+        if: steps.check_release.outputs.result == '404'
+        uses: ncipollo/release-action@v1
+        with:
+          generateReleaseNotes: true
+          tag: ${{ env.project_version }}
+          artifacts: "build/libs/*"
+          token: ${{ secrets.TOKEN }}

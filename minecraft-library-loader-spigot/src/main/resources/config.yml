@@ -1,0 +1,13 @@
+# maven 仓库地址 次序由上到下
+# 最前默认是本地仓库（file://spigot 所在目录/libraries/）
+
+##############################
+#         自定义仓库           #
+##############################
+repositories:
+  aliyun-public:
+    url: https://maven.aliyun.com/repository/public/
+  sonatype-public:
+    url: https://oss.sonatype.org/content/groups/public/
+
+# 最后默认是 maven 中央仓库（https://repo1.maven.org/maven2/）
