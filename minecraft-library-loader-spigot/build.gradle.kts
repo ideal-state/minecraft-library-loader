@@ -104,6 +104,13 @@ tasks.register<Jar>("javadocJar") {
 }
 val javadocJar = tasks.named<Jar>("javadocJar")
 
+tasks.shadowJar {
+    archiveClassifier.set("")
+    manifest {
+        attributes(manifestAttributes)
+    }
+}
+
 tasks.jar {
     dependsOn(sourcesJar, javadocJar)
     archiveClassifier.set("")
@@ -112,7 +119,7 @@ tasks.jar {
     }
     finalizedBy("copyToRootBuildLibs")
 }
-val jar = tasks.named<Jar>("jar")
+val jar = tasks.named<Jar>("shadowJar")
 
 tasks.create<Copy>("copyToRootBuildLibs") {
     from(sourcesJar, javadocJar, jar)
