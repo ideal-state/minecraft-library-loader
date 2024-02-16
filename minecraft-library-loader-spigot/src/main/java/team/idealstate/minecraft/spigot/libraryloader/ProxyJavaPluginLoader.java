@@ -44,7 +44,7 @@ import java.util.regex.Pattern;
  * @version 1.0.0
  * @since 1.0.0
  */
-public class ProxyJavaPluginLoader implements PluginLoader {
+final class ProxyJavaPluginLoader implements PluginLoader {
 
     private static final Logger logger = LogManager.getLogger(ProxyJavaPluginLoader.class);
     private final PluginLoader pluginLoader;
@@ -52,6 +52,10 @@ public class ProxyJavaPluginLoader implements PluginLoader {
     @SuppressWarnings({"deprecation"})
     public ProxyJavaPluginLoader(Server server) {
         this.pluginLoader = new JavaPluginLoader(server);
+    }
+
+    public ProxyJavaPluginLoader(JavaPluginLoader javaPluginLoader) {
+        this.pluginLoader = javaPluginLoader;
     }
 
     @Override
@@ -65,7 +69,7 @@ public class ProxyJavaPluginLoader implements PluginLoader {
         }
 
         YamlConfiguration config = YamlConfiguration.loadConfiguration(
-                new InputStreamReader(loadedPlugin.getResource("/plugin.yml")));
+                new InputStreamReader(loadedPlugin.getResource("plugin.yml")));
         List<String> libraries = config.getStringList("libraries");
         if (libraries.isEmpty()) {
             logger.info("[{}] 无依赖项，跳过依赖项加载", pluginName);

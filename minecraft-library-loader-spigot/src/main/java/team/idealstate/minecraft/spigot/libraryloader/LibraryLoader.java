@@ -18,11 +18,19 @@
 
 package team.idealstate.minecraft.spigot.libraryloader;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginLoader;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.JavaPluginLoader;
 
 import java.io.File;
-import java.net.MalformedURLException;
+import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * <p>LibraryLoader</p>
@@ -35,19 +43,36 @@ import java.net.MalformedURLException;
  */
 public final class LibraryLoader extends JavaPlugin {
 
-    @Override
-    public void onLoad() {
+    private static final Logger logger = LogManager.getLogger(LibraryLoader.class);
+
+    public LibraryLoader() {
+        super();
         saveDefaultConfig();
         File localRepository = new File("./libraries/");
         if (!localRepository.exists()) {
             localRepository.mkdirs();
         }
-        try {
-            MavenResolver.initialize(localRepository,
-                    getConfig().getConfigurationSection("repositories"));
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+        MavenResolver.initialize(localRepository,
+                getConfig().getConfigurationSection("repositories"));
+        PluginManager pluginManager = Bukkit.getPluginManager();
+        if (pluginManager instanceof SimplePluginManager) {
+            try {
+                Field fileAssociations = SimplePluginManager.class.getDeclaredField("fileAssociations");
+                fileAssociations.setAccessible(true);
+                @SuppressWarnings("unchecked")
+                Map<Pattern, PluginLoader> fileAssociationsVal = (Map<Pattern, PluginLoader>) fileAssociations.get(pluginManager);
+                for (Map.Entry<Pattern, PluginLoader> entry : fileAssociationsVal.entrySet()) {
+                    PluginLoader pluginLoader = entry.getValue();
+                    if (pluginLoader instanceof JavaPluginLoader) {
+                        entry.setValue(new ProxyJavaPluginLoader((JavaPluginLoader) pluginLoader));
+                    }
+                }
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            logger.error("不支持的 PluginManager 类型实例，即将关闭服务器");
+            Bukkit.shutdown();
         }
-        Bukkit.getPluginManager().registerInterface(ProxyJavaPluginLoader.class);
     }
 }

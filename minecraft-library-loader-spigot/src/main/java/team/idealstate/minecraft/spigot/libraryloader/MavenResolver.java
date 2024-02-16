@@ -33,11 +33,13 @@ import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.supplier.RepositorySystemSupplier;
-import org.eclipse.aether.transfer.*;
+import org.eclipse.aether.transfer.AbstractTransferListener;
+import org.eclipse.aether.transfer.TransferCancelledException;
+import org.eclipse.aether.transfer.TransferEvent;
+import org.eclipse.aether.transfer.TransferResource;
 import org.eclipse.aether.util.artifact.JavaScopes;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -63,7 +65,7 @@ abstract class MavenResolver {
         SESSION = MavenRepositorySystemUtils.newSession();
     }
 
-    static void initialize(File localRepositories, ConfigurationSection config) throws MalformedURLException {
+    static void initialize(File localRepositories, ConfigurationSection config) {
         SESSION.setChecksumPolicy("fail");
         SESSION.setLocalRepositoryManager(SYSTEM.newLocalRepositoryManager(SESSION,
                 new LocalRepository(localRepositories)));
