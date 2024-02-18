@@ -38,6 +38,7 @@ java {
 
 tasks.compileJava {
     options.encoding = charset
+    options.compilerArgs.add("-parameters")
     finalizedBy(tasks.test)
 }
 
