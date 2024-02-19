@@ -24,11 +24,13 @@ import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.resolution.DependencyResult;
@@ -93,7 +95,7 @@ abstract class MavenResolver {
         repositories = SYSTEM.newResolutionRepositories(SESSION, new ArrayList<>(remoteRepositories));
     }
 
-    public static List<File> resolve(Collection<String> dependencyIds) {
+    public static List<Artifact> resolve(Collection<String> dependencyIds) {
         if (!(dependencyIds instanceof Set)) {
             dependencyIds = new LinkedHashSet<>(dependencyIds);
         }
@@ -118,7 +120,7 @@ abstract class MavenResolver {
         }
         return dependencyResult.getArtifactResults()
                 .stream()
-                .map(artifactResult -> artifactResult.getArtifact().getFile())
+                .map(ArtifactResult::getArtifact)
                 .collect(Collectors.toList());
     }
 
