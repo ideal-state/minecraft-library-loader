@@ -56,6 +56,8 @@ final class DirectDependencyCache extends ConcurrentHashMap<String, Class<?>> {
         }
     }
 
+    private final Set<String> cannotLoadClassNames = new HashSet<>(64, 0.6F);
+
     @Override
     public Class<?> get(Object key) {
         if (!(key instanceof String)) {
@@ -67,14 +69,17 @@ final class DirectDependencyCache extends ConcurrentHashMap<String, Class<?>> {
             return null;
         }
         Class<?> cls = super.get(className);
-        if (cls == null) {
+        if (cls == null && !cannotLoadClassNames.contains(className)) {
             try {
                 loadingClassNames.add(className);
                 logger.trace("尝试从直接依赖内加载类 {}", className);
                 cls = Class.forName(className, true, ucl);
-                logger.debug("已从直接依赖内加载类 {}", className);
+                if (ucl.equals(cls.getClassLoader())) {
+                    logger.trace("已从直接依赖内加载类 {}", className);
+                }
                 put(className, cls);
             } catch (Throwable e) {
+                cannotLoadClassNames.add(className);
                 logger.trace("从直接依赖内加载类时抛出异常", e);
             } finally {
                 loadingClassNames.remove(className);
