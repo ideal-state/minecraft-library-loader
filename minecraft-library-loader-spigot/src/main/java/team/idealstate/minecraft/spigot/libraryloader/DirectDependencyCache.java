@@ -32,8 +32,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>创建于 2024/2/19 15:57</p>
  *
  * @author ketikai
- * @version 1.0.0
- * @since 1.0.0
+ * @version 1.0.1
+ * @since 1.0.1
  */
 final class DirectDependencyCache extends ConcurrentHashMap<String, Class<?>> {
 

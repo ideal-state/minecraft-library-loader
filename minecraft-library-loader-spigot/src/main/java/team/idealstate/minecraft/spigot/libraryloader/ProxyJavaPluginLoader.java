@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
  * <p>创建于 2024/2/15 20:40</p>
  *
  * @author ketikai
- * @version 1.0.0
+ * @version 1.0.1
  * @since 1.0.0
  */
 final class ProxyJavaPluginLoader implements PluginLoader {

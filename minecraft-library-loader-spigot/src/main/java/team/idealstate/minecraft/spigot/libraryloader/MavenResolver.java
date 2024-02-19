@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
  * <p>创建于 2024/2/15 20:50</p>
  *
  * @author ketikai
- * @version 1.0.0
+ * @version 1.0.1
  * @since 1.0.0
  */
 abstract class MavenResolver {
